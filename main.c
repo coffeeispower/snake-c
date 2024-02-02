@@ -1,13 +1,11 @@
 #include "screen.h"
+#include "snake.h"
+#include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <signal.h>
-#include "snake.h"
-#include <stdio.h>
 struct Snake snake = {0};
-void redraw() {
-  snake_render(&snake);
-}
+void redraw() { snake_render(&snake); }
 unsigned long current_time_millis() {
   struct timespec t;
   clock_gettime(CLOCK_MONOTONIC_RAW, &t);
@@ -33,6 +31,5 @@ int main() {
     sleep_duration.tv_sec = 0;
     sleep_duration.tv_nsec = 50000L;
     nanosleep(&sleep_duration, NULL);
-    
   }
 }
