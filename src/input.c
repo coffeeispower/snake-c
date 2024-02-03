@@ -1,44 +1,63 @@
 #include "input.h"
+#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
-#include <assert.h>
-#include <stdbool.h>
 
 bool __raw_mode_enabled = false;
-char _read_char() {
+typedef struct {
   char c;
-  assert(read(STDIN_FILENO, &c, 1) != -1 && "Failed to read character from stdin");
-  return c;
+  bool has_input;
+} ReadChar;
+ReadChar _read_char() {
+  char c;
+  bool has_input = read(STDIN_FILENO, &c, 1) == 1;
+  return (ReadChar){.has_input = has_input, .c = c};
 }
 
 enum SnakeInput read_input() {
   assert(__raw_mode_enabled && "Tried to read input with raw mode disabled");
-  switch(_read_char()) {
-    case 'q':
+  ReadChar c = _read_char();
+  if (!c.has_input) {
+    return NONE;
+  }
+  switch (c.c) {
+  case 'q':
+    return QUIT;
+  case 'r':
+    return RESTART;
+  case '\e':
+    c = _read_char();
+    /// User pressed escape
+    if (!c.has_input) {
       return QUIT;
-    case '\e':
-      assert(_read_char() == '[' && "Expected '[' after escape char'");
-      switch(_read_char()) {
-        case 'A':
-          return UP;
-        case 'B':
-          return DOWN;
-        case 'C':
-          return RIGHT;
-        case 'D':
-          return LEFT;
+    }
+    /// Is arrow key
+    if (c.c == '[') {
+      c = _read_char();
+      assert(c.has_input);
+      switch (c.c) {
+      case 'A':
+        return UP;
+      case 'B':
+        return DOWN;
+      case 'C':
+        return RIGHT;
+      case 'D':
+        return LEFT;
       }
+    }
   }
   return NONE;
 }
 
 struct termios __orig_termios;
 void __at_exit_cleanup_raw_mode() {
-  if(__raw_mode_enabled) {
+  if (__raw_mode_enabled) {
     disable_raw_mode();
   }
 }
@@ -56,7 +75,8 @@ void enable_raw_mode() {
   raw.c_cc[VTIME] = 1;
   assert(tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) != -1);
 }
-void disable_raw_mode() {  
-  assert(__raw_mode_enabled && "Disabled raw mode when it was already disabled");
+void disable_raw_mode() {
+  assert(__raw_mode_enabled &&
+         "Disabled raw mode when it was already disabled");
   assert(tcsetattr(STDIN_FILENO, TCSAFLUSH, &__orig_termios) != -1);
 }

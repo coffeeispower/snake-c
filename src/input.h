@@ -12,7 +12,9 @@ enum SnakeInput {
   /// Turn snake right
   RIGHT,
   /// Quit game
-  QUIT
+  QUIT,
+  /// Restart the game
+  RESTART
 };
 
 enum SnakeInput read_input();

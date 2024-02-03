@@ -72,23 +72,36 @@ void redraw() {
     break;
   }
 }
+
+void reset_game() {
+  snake.trail_max_size = 2;
+  snake.direction = (struct Vector2){1, 0};
+  snake.trail_size = 0;
+  snake_move_to(&snake, random_position());
+  randomize_fruit();
+  state = Playing;
+}
+
 int main() {
+  unsigned long last_update_time = current_time_millis();
+  srand(last_update_time);
+  
   hide_cursor();
   enable_raw_mode();
   atexit(show_cursor);
   atexit(reset_screen);
   signal(SIGWINCH, redraw);
-  snake.trail_max_size = 2;
-  snake.direction = (struct Vector2){1, 0};
-  unsigned long last_update_time = current_time_millis();
-  srand(last_update_time);
-  snake_move_to(&snake, random_position());
-  randomize_fruit();
+  
+  reset_game();
+  
   while (true) {
     unsigned long delta = current_time_millis() - last_update_time;
     enum SnakeInput input = read_input();
     if (input == QUIT) {
       break;
+    }
+    if (input == RESTART && state != Playing) {
+      reset_game();
     }
     if ((delta >= 500 / snake.trail_max_size || input != NONE) &&
         state == Playing) {
