@@ -9,9 +9,16 @@
 #include <string.h>
 #include <time.h>
 enum GameState { Playing, Lost, Win };
+const unsigned long initial_size = 2;
 struct Snake snake = {0};
 struct Fruit fruit = {0};
 enum GameState state = Playing;
+
+unsigned long score() {
+  return snake.trail_max_size - initial_size;
+}
+
+
 unsigned long current_time_millis() {
   struct timespec t;
   clock_gettime(CLOCK_MONOTONIC_RAW, &t);
@@ -71,6 +78,9 @@ void redraw() {
     render_win_screen();
     break;
   }
+  move_cursor(0, get_terminal_size().y-1);
+  printf("Pontuação: %lu", score());
+  fflush(stdout);
 }
 
 void reset_game() {
@@ -125,7 +135,7 @@ int main() {
     if (input == RESTART && state != Playing) {
       reset_game();
     }
-    if ((delta >= 500 / snake.trail_max_size || input != NONE) &&
+    if ((delta >= 500 / (score()+1) || input != NONE) &&
         state == Playing) {
       snake_update(&snake, input);
       handle_fruit_collision();
