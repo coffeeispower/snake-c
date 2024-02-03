@@ -1,3 +1,4 @@
 .cache/clangd/index
 compile_commands.json
 snake
+.direnv
