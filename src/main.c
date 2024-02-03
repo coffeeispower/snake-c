@@ -17,6 +17,7 @@ int main() {
   enable_raw_mode();
   unsigned long last_update_time = current_time_millis();
   atexit(show_cursor);
+  atexit(reset_screen);
   signal(SIGWINCH, redraw);
   snake.trail_max_size = 5;
   snake.direction = (struct Vector2){1, 0};
