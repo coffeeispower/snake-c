@@ -12,7 +12,7 @@
           default = mkShell {
             buildInputs = [
               bear
-              clang
+              gcc
               clang-tools
               gnumake
             ];
