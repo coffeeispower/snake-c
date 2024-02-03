@@ -3,7 +3,7 @@
 #include "vectors.h"
 /// Moves the cursor to the specified coordinates
 /// `x` and `y` start from 0
-void move_cursor(unsigned int x, unsigned int y);
+void move_cursor(int x, int y);
 /// Hide terminal cursor
 void hide_cursor();
 /// Show terminal cursor
@@ -38,4 +38,5 @@ void set_color_256(unsigned char color);
 /// for the available colors
 void set_bg_color_256(unsigned char color);
 
+void draw_rectangle_border(struct Vector2 position, struct Vector2 size);
 #endif

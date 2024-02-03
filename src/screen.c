@@ -1,7 +1,12 @@
 #include "screen.h"
+#include "vectors.h"
 #include <stdio.h>
 #include <sys/ioctl.h>
-void move_cursor(unsigned int x, unsigned int y) {
+void move_cursor(int x, int y) {
+  if(x < 0) x = 0;
+  if(y < 0) y = 0;
+  if(x > get_terminal_size().x) x = get_terminal_size().x;
+  if(y > get_terminal_size().y) y = get_terminal_size().y;
   printf("\e[%d;%dH", y+1, x+1);
 }
 void hide_cursor() {
@@ -47,3 +52,26 @@ void set_bg_color_256(unsigned char color) {
   printf("\e[48;5;%dm", color);
 }
 
+void draw_rectangle_border(struct Vector2 position, struct Vector2 size){
+  move_cursor(position.x, position.y);
+  printf("┏");
+  for (int i = 1; i < size.x-1; i++) {
+    printf("━");
+  }
+  printf("┓");
+  for(int i = 1; i < size.y-1; i++) {  
+    move_cursor(position.x, position.y+i);
+    printf("┃");
+    for (int i = 1; i < size.x-1; i++) {
+      printf(" ");
+    }
+    printf("┃");
+  }
+  
+  move_cursor(position.x, position.y+size.y-1);
+  printf("┗");
+  for (int i = 1; i < size.x-1; i++) {
+    printf("━");
+  }
+  printf("┛");
+}

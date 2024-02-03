@@ -48,9 +48,21 @@ bool snake_is_head(struct Snake *self, struct Vector2 v) {
   struct Vector2 head = *snake_head(self);
   return head.x == v.x && head.y == v.y;
 }
+bool snake_check_self_collision(struct Snake *self) {
+  for (int i = 0; i < self->trail_size - 1; i++) {
+    if (snake_is_head(self, self->trail_data[i])) {
+      return true;
+    }
+  }
+  return false;
+}
 void snake_render(struct Snake *self) {
   for (unsigned long i = 0; i < self->trail_size; i++) {
     struct Vector2 pos = self->trail_data[i];
+    if (pos.x < 0 || pos.y < 0 || pos.x * 2 >= get_terminal_size().x ||
+        pos.y >= get_terminal_size().y) {
+      continue;
+    }
     move_cursor(pos.x * 2, pos.y);
     set_bg_color_256(41);
     set_color_256(0);

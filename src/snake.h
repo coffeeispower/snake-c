@@ -26,4 +26,7 @@ void snake_render(struct Snake* self);
 void snake_update(struct Snake* self, enum SnakeInput input);
 
 bool snake_is_head(struct Snake *self, struct Vector2 v);
+
+bool snake_check_self_collision(struct Snake *self);
+
 #endif
