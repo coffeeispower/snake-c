@@ -8,13 +8,6 @@
 #include <stdlib.h>
 
 void snake_move_to(struct Snake *self, struct Vector2 new_head_position) {
-  if (self->trail_data == 0 || self->trail_capacity == 0) {
-    self->trail_capacity = 10;
-    self->trail_size = 1;
-    self->trail_data = calloc(self->trail_capacity, sizeof(struct Vector2));
-    *snake_head(self) = new_head_position;
-    return;
-  }
   snake_push(self, new_head_position);
   if (self->trail_size > self->trail_max_size) {
     snake_pop_tip(self);
@@ -32,8 +25,8 @@ struct Vector2 snake_pop_tip(struct Snake *self) {
 }
 
 void snake_push(struct Snake *self, struct Vector2 new_head_position) {
-  if (self->trail_capacity == self->trail_size) {
-    self->trail_capacity += 5;
+  if (self->trail_capacity <= self->trail_size) {
+    self->trail_capacity = self->trail_size + 5;
     self->trail_data = realloc(self->trail_data, self->trail_capacity);
   }
   self->trail_data[self->trail_size] = new_head_position;
@@ -73,7 +66,6 @@ void snake_render(struct Snake *self) {
     }
     reset_styles();
   }
-  fflush(stdout);
 }
 void snake_update(struct Snake *self, enum SnakeInput input) {
   switch (input) {
@@ -95,6 +87,7 @@ void snake_update(struct Snake *self, enum SnakeInput input) {
     break;
   case QUIT:
   case NONE:
+  case RESTART:
     break;
   }
   snake_move_to(self, vec2_add(*snake_head(self), self->direction));
