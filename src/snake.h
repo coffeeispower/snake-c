@@ -1,3 +1,4 @@
+#include "input.h"
 #ifndef SNAKE_H
 #include "vectors.h"
 #define SNAKE_H
@@ -21,5 +22,5 @@ struct Vector2* snake_head(struct Snake* snake);
 
 struct Vector2* snake_tip(struct Snake* snake);
 void snake_render(struct Snake* self);
-void snake_update(struct Snake* self);
+void snake_update(struct Snake* self, enum SnakeInput input);
 #endif

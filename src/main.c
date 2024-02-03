@@ -1,3 +1,4 @@
+#include "input.h"
 #include "screen.h"
 #include "snake.h"
 #include <signal.h>
@@ -13,6 +14,7 @@ unsigned long current_time_millis() {
 }
 int main() {
   hide_cursor();
+  enable_raw_mode();
   unsigned long last_update_time = current_time_millis();
   atexit(show_cursor);
   signal(SIGWINCH, redraw);
@@ -21,8 +23,12 @@ int main() {
   snake_move_to(&snake, (struct Vector2){.x = 6, .y = 4});
   while (1) {
     unsigned long delta = current_time_millis() - last_update_time;
-    if (delta >= 500) {
-      snake_update(&snake);
+    enum SnakeInput input = read_input();
+    if(input == QUIT) {
+      break;
+    }
+    if (delta >= 500 || input != NONE) {
+      snake_update(&snake, input);
       last_update_time = current_time_millis();
     }
     reset_screen();

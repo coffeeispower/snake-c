@@ -1,4 +1,5 @@
 #include "snake.h"
+#include "input.h"
 #include "screen.h"
 #include "vectors.h"
 #include <assert.h>
@@ -53,6 +54,27 @@ void snake_render(struct Snake *self) {
   }
   fflush(stdout);
 }
-void snake_update(struct Snake *self) {
+void snake_update(struct Snake *self, enum SnakeInput input) {
+  switch(input){
+    case UP:
+      if (self->direction.x != 0)
+        self->direction = (struct Vector2) {0, -1};
+      break;
+    case DOWN:
+      if (self->direction.x != 0)
+      self->direction = (struct Vector2) {0, 1};
+      break;
+    case LEFT:
+      if (self->direction.y != 0)
+        self->direction = (struct Vector2) {-1, 0};
+      break;
+    case RIGHT:
+      if (self->direction.y != 0)
+        self->direction = (struct Vector2) {1, 0};
+      break;
+    case QUIT:
+    case NONE:
+      break;
+  }
   snake_move_to(self, vec2_add(*snake_head(self), self->direction));
 }

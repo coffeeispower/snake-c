@@ -1,7 +1,7 @@
 #ifndef VECTORS_H
 #define VECTORS_H
 struct Vector2 {
-  unsigned long x, y;
+  long x, y;
 };
 
 void vec2_debug(struct Vector2 v);
