@@ -1,6 +1,7 @@
 #include "input.h"
 #ifndef SNAKE_H
 #include "vectors.h"
+#include <stdbool.h>
 #define SNAKE_H
 struct Snake {
   struct Vector2* trail_data;
@@ -23,4 +24,6 @@ struct Vector2* snake_head(struct Snake* snake);
 struct Vector2* snake_tip(struct Snake* snake);
 void snake_render(struct Snake* self);
 void snake_update(struct Snake* self, enum SnakeInput input);
+
+bool snake_is_head(struct Snake *self, struct Vector2 v);
 #endif

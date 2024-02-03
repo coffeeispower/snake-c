@@ -16,7 +16,7 @@ void snake_move_to(struct Snake *self, struct Vector2 new_head_position) {
     return;
   }
   snake_push(self, new_head_position);
-  if (self->trail_size >= self->trail_max_size) {
+  if (self->trail_size > self->trail_max_size) {
     snake_pop_tip(self);
   }
 }
@@ -33,7 +33,7 @@ struct Vector2 snake_pop_tip(struct Snake *self) {
 
 void snake_push(struct Snake *self, struct Vector2 new_head_position) {
   if (self->trail_capacity == self->trail_size) {
-    self->trail_capacity *= 2;
+    self->trail_capacity += 5;
     self->trail_data = realloc(self->trail_data, self->trail_capacity);
   }
   self->trail_data[self->trail_size] = new_head_position;
