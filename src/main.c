@@ -81,7 +81,29 @@ void reset_game() {
   randomize_fruit();
   state = Playing;
 }
-
+void handle_self_collision() {
+  if (snake_check_self_collision(&snake) ||
+      snake_head(&snake)->x >
+          get_terminal_size().x/2 - 1 ||
+      snake_head(&snake)->y>
+          get_terminal_size().y - 1 ||
+      snake_head(&snake)->x < 0 ||
+      snake_head(&snake)->y < 0) {
+    state = Lost;
+  }
+}
+void handle_fruit_collision() {
+  if (fruit_snake_collision(&fruit, &snake)) {
+    randomize_fruit();
+    snake.trail_max_size++;
+  }
+}
+void handle_win() {
+  if (snake.trail_max_size >=
+      (get_terminal_size().x / 2) * get_terminal_size().y) {
+    state = Win;
+  }
+}
 int main() {
   unsigned long last_update_time = current_time_millis();
   srand(last_update_time);
@@ -106,23 +128,9 @@ int main() {
     if ((delta >= 500 / snake.trail_max_size || input != NONE) &&
         state == Playing) {
       snake_update(&snake, input);
-      if (snake_check_self_collision(&snake) ||
-          snake_head(&snake)->x >
-              get_terminal_size().x/2 - 1 ||
-          snake_head(&snake)->y>
-              get_terminal_size().y - 1 ||
-          snake_head(&snake)->x < 0 ||
-          snake_head(&snake)->y < 0) {
-        state = Lost;
-      }
-      if (fruit_snake_collision(&fruit, &snake)) {
-        randomize_fruit();
-        snake.trail_max_size++;
-      }
-      if (snake.trail_max_size >=
-          (get_terminal_size().x / 2) * get_terminal_size().y) {
-        state = Win;
-      }
+      handle_fruit_collision();
+      handle_self_collision();
+      handle_win();
       last_update_time = current_time_millis();
     }
     redraw();
