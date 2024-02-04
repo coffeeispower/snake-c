@@ -17,9 +17,9 @@ enum SnakeInput {
   RESTART
 };
 
-enum SnakeInput read_input();
+enum SnakeInput read_input(void);
 // Enables raw mode to be able to get inputs immediately without pressing enter
-void enable_raw_mode();
+void enable_raw_mode(void);
 // Disables raw mode, switching back to the state of the terminal when the program started
-void disable_raw_mode();
+void disable_raw_mode(void);
 #endif

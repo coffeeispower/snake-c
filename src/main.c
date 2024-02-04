@@ -14,18 +14,18 @@ struct Snake snake = {0};
 struct Fruit fruit = {0};
 enum GameState state = Playing;
 
-unsigned long score() { return snake.trail_max_size - initial_size; }
+unsigned long score(void) { return snake.trail_max_size - initial_size; }
 
-unsigned long current_time_millis() {
+unsigned long current_time_millis(void) {
   struct timespec t;
   clock_gettime(CLOCK_MONOTONIC_RAW, &t);
   return (t.tv_sec * 1000) + (t.tv_nsec / 1000000);
 }
-struct Vector2 random_position() {
+struct Vector2 random_position(void) {
   return (struct Vector2){.x = rand() % (get_terminal_size().x / 2),
                           .y = rand() % get_terminal_size().y};
 }
-void randomize_fruit() { fruit.position = random_position(); }
+void randomize_fruit(void) { fruit.position = random_position(); }
 void text_center(const char *text, int offset_x, int offset_y) {
   struct Vector2 text_position = (struct Vector2){
       .x = get_terminal_size().x / 2 - strlen(text) / 2 + offset_x,
@@ -34,7 +34,7 @@ void text_center(const char *text, int offset_x, int offset_y) {
   move_cursor(text_position.x, text_position.y);
   puts(text);
 }
-void render_lost_screen() {
+void render_lost_screen(void) {
   struct Vector2 dialog_size = get_terminal_size();
   dialog_size.x *= 0.3;
   dialog_size.y = 6;
@@ -46,7 +46,7 @@ void render_lost_screen() {
   text_center("Aperta R para jogar outra vez", 0, 0);
   fflush(stdout);
 }
-void render_win_screen() {
+void render_win_screen(void) {
 
   struct Vector2 dialog_size = get_terminal_size();
   dialog_size.x *= 0.3;
@@ -59,7 +59,7 @@ void render_win_screen() {
   text_center("Conseguiste preencher o ecrã inteiro com a cobra", 0, 0);
   fflush(stdout);
 }
-void redraw() {
+void redraw(void) {
   reset_screen();
   snake_render(&snake);
   reset_styles();
@@ -79,8 +79,10 @@ void redraw() {
   printf("Pontuação: %lu", score());
   fflush(stdout);
 }
-
-void reset_game() {
+void handle_resize(int signal) {
+  redraw();
+}
+void reset_game(void) {
   snake.trail_max_size = 2;
   snake.direction = (struct Vector2){1, 0};
   snake.trail_size = 0;
@@ -88,7 +90,7 @@ void reset_game() {
   randomize_fruit();
   state = Playing;
 }
-void handle_self_collision() {
+void handle_self_collision(void) {
   if (snake_check_self_collision(&snake) ||
       snake_head(&snake)->x > get_terminal_size().x / 2 - 1 ||
       snake_head(&snake)->y > get_terminal_size().y - 1 ||
@@ -96,19 +98,19 @@ void handle_self_collision() {
     state = Lost;
   }
 }
-void handle_fruit_collision() {
+void handle_fruit_collision(void) {
   if (fruit_snake_collision(&fruit, &snake)) {
     randomize_fruit();
     snake.trail_max_size++;
   }
 }
-void handle_win() {
+void handle_win(void) {
   if (snake.trail_max_size >=
       (get_terminal_size().x / 2) * get_terminal_size().y) {
     state = Win;
   }
 }
-int main() {
+int main(void) {
   unsigned long last_update_time = current_time_millis();
   srand(last_update_time);
 
@@ -116,7 +118,7 @@ int main() {
   enable_raw_mode();
   atexit(show_cursor);
   atexit(reset_screen);
-  signal(SIGWINCH, redraw);
+  signal(SIGWINCH, handle_resize);
 
   reset_game();
 

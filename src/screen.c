@@ -9,25 +9,31 @@ void move_cursor(int x, int y) {
   if(y > get_terminal_size().y) y = get_terminal_size().y;
   printf("\e[%d;%dH", y+1, x+1);
 }
-void hide_cursor() {
+void hide_cursor(void) {
   printf("\e[?25l");
 }
 
-void show_cursor() {
+void show_cursor(void) {
   printf("\e[?25h");
 }
-void clear_screen() {
+void clear_screen(void) {
   printf("\e[2J");
   printf("\e[3J");
 }
-void reset_screen() {
+void reset_screen(void) {
   clear_screen();
   move_cursor(0, 0);
 }
-void reset_styles() {
+void reset_styles(void) {
   printf("\e[2;0;0m\e[0m");
 }
-struct Vector2 get_terminal_size() {
+void switch_to_alternative_screen(void) {
+  printf("\e[?1049h");
+}
+void exit_alternative_screen(void) {
+  printf("\e[?1049l");
+}
+struct Vector2 get_terminal_size(void) {
   struct winsize sz;
   ioctl( 0, TIOCGWINSZ, &sz );
   return (struct Vector2) {
