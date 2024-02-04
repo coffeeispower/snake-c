@@ -141,9 +141,10 @@ int main(void) {
       }
       redraw();
     }
+    // Add a bit of delay to prevent the computer from catching fire
     struct timespec sleep_duration = {0};
     sleep_duration.tv_sec = 0;
-    sleep_duration.tv_nsec = 50000L;
+    sleep_duration.tv_nsec = 16666666L; // (1/60) seconds for 60 fps
     nanosleep(&sleep_duration, NULL);
   }
 }
