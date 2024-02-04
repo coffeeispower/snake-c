@@ -14,10 +14,7 @@ struct Snake snake = {0};
 struct Fruit fruit = {0};
 enum GameState state = Playing;
 
-unsigned long score() {
-  return snake.trail_max_size - initial_size;
-}
-
+unsigned long score() { return snake.trail_max_size - initial_size; }
 
 unsigned long current_time_millis() {
   struct timespec t;
@@ -78,7 +75,7 @@ void redraw() {
     render_win_screen();
     break;
   }
-  move_cursor(0, get_terminal_size().y-1);
+  move_cursor(0, get_terminal_size().y - 1);
   printf("Pontuação: %lu", score());
   fflush(stdout);
 }
@@ -93,12 +90,9 @@ void reset_game() {
 }
 void handle_self_collision() {
   if (snake_check_self_collision(&snake) ||
-      snake_head(&snake)->x >
-          get_terminal_size().x/2 - 1 ||
-      snake_head(&snake)->y>
-          get_terminal_size().y - 1 ||
-      snake_head(&snake)->x < 0 ||
-      snake_head(&snake)->y < 0) {
+      snake_head(&snake)->x > get_terminal_size().x / 2 - 1 ||
+      snake_head(&snake)->y > get_terminal_size().y - 1 ||
+      snake_head(&snake)->x < 0 || snake_head(&snake)->y < 0) {
     state = Lost;
   }
 }
@@ -117,15 +111,15 @@ void handle_win() {
 int main() {
   unsigned long last_update_time = current_time_millis();
   srand(last_update_time);
-  
+
   hide_cursor();
   enable_raw_mode();
   atexit(show_cursor);
   atexit(reset_screen);
   signal(SIGWINCH, redraw);
-  
+
   reset_game();
-  
+
   while (true) {
     unsigned long delta = current_time_millis() - last_update_time;
     enum SnakeInput input = read_input();
@@ -135,15 +129,16 @@ int main() {
     if (input == RESTART && state != Playing) {
       reset_game();
     }
-    if ((delta >= 500 / (score()+1) || input != NONE) &&
-        state == Playing) {
-      snake_update(&snake, input);
-      handle_fruit_collision();
-      handle_self_collision();
-      handle_win();
-      last_update_time = current_time_millis();
+    if ((delta >= 500 / (score() + 1) || input != NONE)) {
+      if (state == Playing) {
+        snake_update(&snake, input);
+        handle_fruit_collision();
+        handle_self_collision();
+        handle_win();
+        last_update_time = current_time_millis();
+      }
+      redraw();
     }
-    redraw();
     struct timespec sleep_duration = {0};
     sleep_duration.tv_sec = 0;
     sleep_duration.tv_nsec = 50000L;
