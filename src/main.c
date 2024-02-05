@@ -3,6 +3,7 @@
 #include "screen.h"
 #include "snake.h"
 #include "vectors.h"
+#include <math.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +14,6 @@ const unsigned long initial_size = 2;
 struct Snake snake = {0};
 struct Fruit fruit = {0};
 enum GameState state = Playing;
-
 unsigned long score(void) { return snake.trail_max_size - initial_size; }
 
 unsigned long current_time_millis(void) {
@@ -143,7 +143,7 @@ int main(void) {
     if (input == RESTART && state != Playing) {
       reset_game();
     }
-    if ((delta >= 500 / (score() + 1) || input != NONE)) {
+    if ((delta >= 500 / (powf(3, score() + 1)) || input != NONE)) {
       if (state == Playing) {
         snake_update(&snake, input);
         handle_fruit_collision();

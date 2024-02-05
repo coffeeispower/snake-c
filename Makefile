@@ -12,7 +12,7 @@ all: $(BUILDDIR)/snake
 $(BUILDDIR)/snake: $(SRC)
 	@ echo !==== COMPILING $^
 	@ mkdir -p $(@D)
-	$(CC) $(CFLAGS) $(SRC) -o $@
+	$(CC) $(CFLAGS) $(SRC) -lm -o $@
 clean:
 	rm $(BUILDDIR) -rfv
 run: all
