@@ -114,6 +114,9 @@ int main(void) {
   unsigned long last_update_time = current_time_millis();
   srand(last_update_time);
 
+  switch_to_alternative_screen();
+  atexit(exit_alternative_screen);
+
   hide_cursor();
   enable_raw_mode();
   atexit(show_cursor);
