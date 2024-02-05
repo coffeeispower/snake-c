@@ -35,21 +35,21 @@ void text_center(const char *text, int offset_x, int offset_y) {
   puts(text);
 }
 void render_lost_screen(void) {
-  struct Vector2 dialog_size = get_terminal_size();
-  dialog_size.x *= 0.3;
+  struct Vector2 dialog_size;
+  dialog_size.x = 40;
   dialog_size.y = 6;
   struct Vector2 dialog_position =
       (struct Vector2){.x = get_terminal_size().x / 2 - dialog_size.x / 2,
                        .y = get_terminal_size().y / 2 - dialog_size.y / 2};
   draw_rectangle_border(dialog_position, dialog_size);
-  text_center("Burro do krl 🤦", 0, -1);
+  text_center("Perdeu", 0, -1);
   text_center("Aperta R para jogar outra vez", 0, 0);
   fflush(stdout);
 }
 void render_win_screen(void) {
 
-  struct Vector2 dialog_size = get_terminal_size();
-  dialog_size.x *= 0.3;
+  struct Vector2 dialog_size;
+  dialog_size.x = 55;
   dialog_size.y = 6;
   struct Vector2 dialog_position =
       (struct Vector2){.x = get_terminal_size().x / 2 - dialog_size.x / 2,
@@ -58,6 +58,15 @@ void render_win_screen(void) {
   text_center("Parabens por fazer o minimo ⭐", 0, -1);
   text_center("Conseguiste preencher o ecrã inteiro com a cobra", 0, 0);
   fflush(stdout);
+}
+unsigned long digits_of_number(unsigned long n) {
+  unsigned long state = n;
+  unsigned long count = 0;
+  do {
+    state /= 10;
+    count++;
+  } while (state != 0);
+  return count;
 }
 void redraw(void) {
   reset_screen();
@@ -75,13 +84,13 @@ void redraw(void) {
     render_win_screen();
     break;
   }
-  move_cursor(0, get_terminal_size().y - 1);
-  printf("Pontuação: %lu", score());
+  char* score_label = "Pontuação: ";
+  unsigned long score_text_size = strlen(score_label) + digits_of_number(score());
+  move_cursor(get_terminal_size().x-score_text_size, get_terminal_size().y - 1);
+  printf("%s%lu", score_label, score());
   fflush(stdout);
 }
-void handle_resize(int signal) {
-  redraw();
-}
+void handle_resize(int signal) { redraw(); }
 void reset_game(void) {
   snake.trail_max_size = 2;
   snake.direction = (struct Vector2){1, 0};
