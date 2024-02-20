@@ -8,10 +8,10 @@ Um jogo da cobra em C puro sem bibliotecas que funciona no terminal
 ---
 # Como funciona a entrada?
 
-## Modo canónico vs Modo cozinhado
+## Modo cru vs Modo cozinhado
 
 Em linux, o `stdin` (stream de entrada padrão) em que recebemos input do utilizador, existe 2 modos:
-- Modo **canónico**: O usuário precisa apertar enter pra receber a entrada
+- Modo **cozinhado**: O usuário precisa apertar enter pra receber a entrada
 - Modo **cru**: O programa imediatamente recebe o caracter após a tecla ser pressionada
 
 O `stdin` começa no modo canónico, então para este jogo precisei de mudar para o modo cru:
