@@ -16,11 +16,6 @@ Em linux, o `stdin` (stream de entrada padrão) em que recebemos input do utiliz
 
 O `stdin` começa no modo canónico, então para este jogo precisei de mudar para o modo cru:
 ```cpp
-///#include <stdlib.h>
-///#include <stdio.h>
-///#include <termios.h>
-///#include <unistd.h>
-///int main(void) {
 struct termios orig;
 // Pegar a configuração atual para usar como base
 tcgetattr(STDIN_FILENO, &orig);
@@ -36,7 +31,6 @@ raw.c_cc[VTIME] = 1;
 tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 // Voltar a configuração original no final do programa
 tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig);
-///}
 ```
 
 ---
@@ -47,11 +41,16 @@ tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig);
 
 Agora no modo cru podemos usar a função `read` para ler caracteres
 ```cpp
-char c;
-// Fica `true` se conseguiu ler um caracter, se não `false`
-bool has_character = read(STDIN_FILENO, &c, 1);
-if(has_character){
-  printf("%c\n", c);
+
+char c[1];
+// A função read retorna o numero de carateres que conseguiu ler
+int read_characters_count = read(STDIN_FILENO, 
+  /* Lugar para guardar os caracteres */ &c, 
+  /* Numero de caracteres a ler */ sizeof(c));
+
+// Se conseguimos ler pelo menos 1 caracter printamos o caracter
+if(read_characters_count > 0){
+  printf("%c\n", c[0]);
 }
 ```
 
@@ -65,14 +64,43 @@ o utilizador apertou uma tecla especial como **as setas**.
 ## Teclas não ASCII
 
 Quando apertamos as setas outras teclas especiais, estes caracteres são dados como entrada:
+
 - `\e[A`: Seta para cima
 - `\e[B`: Seta para baixo
 - `\e[C`: Seta para direita
 - `\e[D`: Seta para esquerda
 - `\e`: Escape
 
-**NOTA:** No caso de ter vários caracteres como nas setas, é preciso chamar o `read` várias vezes para puxar os proximos caracteres
+**NOTA:** No caso de ter vários caracteres como nas setas, é preciso chamar o `read` mais vezes ou aumentar o numero de caracteres a ler
+
 ---
 
 # Ponto de entrada e fluxo de atualização
+
+## Função `main`:
+- Inicialização do "raw mode"
+- Mudança para a tela alternativa
+- Enquanto o jogo não for fechado:
+  - Se passou algum tempo desde o ultimo movimento automático
+    - Move a cobra para a frente
+  - Desenha o jogo
+  - Verifica a entrada com a função `read`
+    - Se apertou as setas, muda a cobra de direção e move a cobra
+    - Sai do jogo se apertar `q` ou `Esc`
+  - Espera algum tempo para a proxima atualização (para não fritar o pc)
+- Coloca o terminal no estado normal
+- Volta para a tela normal (restaurando o historico do terminal)
+
+## Quando a cobra for movida:
+- A cabeça colide com a frutinha?
+  - Aumenta o tamanho da cobra
+  - Acelera a cobra
+  
+---
+
+# Bora ver isto a funcionar
+
+```bash
+///alacritty -e target/snake
+```
 
