@@ -9,17 +9,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include<sys/time.h>
+
+
 enum GameState { Playing, Lost, Win };
+
 const unsigned long initial_size = 2;
 struct Snake snake = {0};
 struct Fruit fruit = {0};
 enum GameState state = Playing;
 unsigned long score(void) { return snake.trail_max_size - initial_size; }
-
 unsigned long current_time_millis(void) {
-  struct timespec t;
-  clock_gettime(CLOCK_MONOTONIC_RAW, &t);
-  return (t.tv_sec * 1000) + (t.tv_nsec / 1000000);
+    struct timeval t;
+    gettimeofday(&t, NULL);
+    return (t.tv_sec * 1000) + (t.tv_usec / 1000);
 }
 struct Vector2 random_position(void) {
   return (struct Vector2){.x = rand() % (get_terminal_size().x / 2),
