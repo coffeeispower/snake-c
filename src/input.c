@@ -7,6 +7,13 @@
 #include <stdlib.h>
 #ifdef _WIN32
 #include <windows.h>
+#ifndef ENABLE_VIRTUAL_TERMINAL_INPUT
+#define ENABLE_VIRTUAL_TERMINAL_INPUT 0x0200
+#endif
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+#include <conio.h>
 #else
 #include <termios.h>
 #endif
@@ -18,9 +25,19 @@ typedef struct {
   bool has_input;
 } ReadChar;
 ReadChar _read_char() {
+#ifdef _WIN32
+  if(!_kbhit()) {
+    return (ReadChar) {.has_input = false};
+  }
+  
+  char c;
+  assert(read(STDIN_FILENO, &c, 1));
+  return (ReadChar){.has_input = true, .c = c};
+#else
   char c;
   bool has_input = read(STDIN_FILENO, &c, 1) == 1;
   return (ReadChar){.has_input = has_input, .c = c};
+#endif
 }
 
 enum SnakeInput read_input(void) {
