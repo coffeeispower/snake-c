@@ -9,6 +9,13 @@
         pkgs = import nixpkgs { inherit system;  };
       in with pkgs; {
         devShells = {
+          ghactions = mkShell {
+            buildInputs = [
+              pkgsCross.mingwW64.buildPackages.gcc
+              gcc
+              gnumake
+            ];
+          };
           default = mkShell {
             buildInputs = [
               bear

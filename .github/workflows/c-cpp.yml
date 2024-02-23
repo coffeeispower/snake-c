@@ -2,16 +2,17 @@ name: Compile Check
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
+    - name: Install Nix
+      uses: cachix/install-nix-action@v17
+      with:
+        # Mostly to avoid GitHub rate limiting
+        extra_nix_config: |
+          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
     - name: Try compiling
-      run: make
+      run: nix develop ".#ghactions" --command make
