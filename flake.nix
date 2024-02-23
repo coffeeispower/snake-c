@@ -6,7 +6,7 @@
   outputs = { self, nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs { inherit system; };
+        pkgs = import nixpkgs { inherit system;  };
       in with pkgs; {
         devShells = {
           default = mkShell {
@@ -15,6 +15,7 @@
               gcc
               clang-tools
               gnumake
+              pkgsCross.mingwW64.buildPackages.gcc
             ];
           };
         };
