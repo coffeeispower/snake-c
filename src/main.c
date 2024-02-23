@@ -2,6 +2,7 @@
 #include "input.h"
 #include "screen.h"
 #include "snake.h"
+#include "unistd.h"
 #include "vectors.h"
 #include <math.h>
 #include <signal.h>
@@ -93,7 +94,7 @@ void redraw(void) {
   printf("%s%lu", score_label, score());
   fflush(stdout);
 }
-void handle_resize(int signal) { redraw(); }
+void handle_resize(int _signal) { redraw(); }
 void reset_game(void) {
   snake.trail_max_size = 2;
   snake.direction = (struct Vector2){1, 0};
@@ -133,10 +134,13 @@ int main(void) {
   enable_raw_mode();
   atexit(show_cursor);
   atexit(reset_screen);
+  #ifndef _WIN32
   signal(SIGWINCH, handle_resize);
-
+  #else
+  struct Vector2 last_terminal_size = get_terminal_size();
+  #endif
   reset_game();
-
+  
   while (true) {
     unsigned long delta = current_time_millis() - last_update_time;
     enum SnakeInput input = read_input();
@@ -156,10 +160,14 @@ int main(void) {
       }
       redraw();
     }
+    #ifdef _WIN32
+    struct Vector2 current_terminal_size = get_terminal_size();
+    if (last_terminal_size.x != current_terminal_size.x || last_terminal_size.y != current_terminal_size.y) {
+      handle_resize(0);
+      last_terminal_size = current_terminal_size;
+    }
+    #endif
     // Add a bit of delay to prevent the computer from catching fire
-    struct timespec sleep_duration = {0};
-    sleep_duration.tv_sec = 0;
-    sleep_duration.tv_nsec = 16666666L; // (1/60) seconds for 60 fps
-    nanosleep(&sleep_duration, NULL);
+    usleep(16666L);
   }
 }

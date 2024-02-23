@@ -5,7 +5,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <termios.h>
+#endif
 #include <unistd.h>
 
 bool __raw_mode_enabled = false;
@@ -54,7 +58,40 @@ enum SnakeInput read_input(void) {
   }
   return NONE;
 }
+#ifdef _WIN32
+DWORD original_stdout_console_mode;
+DWORD original_stdin_console_mode;
+void __at_exit_cleanup_raw_mode(void) {
+  if (__raw_mode_enabled) {
+    disable_raw_mode();
+  }
+}
+void enable_raw_mode(void) {
+  assert(!__raw_mode_enabled && "Double enable raw mode");
+  __raw_mode_enabled = true;
 
+  HANDLE consoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
+  HANDLE consoleIn = GetStdHandle(STD_INPUT_HANDLE);
+  assert(GetConsoleMode(consoleOut, &original_stdout_console_mode));
+  assert(GetConsoleMode(consoleIn, &original_stdin_console_mode));
+  
+  atexit(__at_exit_cleanup_raw_mode);
+  // Disables all flags except virtual terminal input
+  // Documentation: https://learn.microsoft.com/en-us/windows/console/setconsolemode
+  assert(SetConsoleMode(consoleIn, ENABLE_VIRTUAL_TERMINAL_INPUT));
+
+  
+  assert(SetConsoleMode(consoleOut, ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING));
+}
+void disable_raw_mode(void) {
+  assert(__raw_mode_enabled &&
+         "Disabled raw mode when it was already disabled");
+  HANDLE consoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
+  HANDLE consoleIn = GetStdHandle(STD_INPUT_HANDLE);
+  assert(SetConsoleMode(consoleOut, original_stdout_console_mode));
+  assert(SetConsoleMode(consoleIn, original_stdin_console_mode));
+}
+#else
 struct termios __orig_termios;
 void __at_exit_cleanup_raw_mode(void) {
   if (__raw_mode_enabled) {
@@ -80,3 +117,4 @@ void disable_raw_mode(void) {
          "Disabled raw mode when it was already disabled");
   assert(tcsetattr(STDIN_FILENO, TCSAFLUSH, &__orig_termios) != -1);
 }
+#endif
