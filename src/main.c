@@ -11,7 +11,9 @@
 #include <string.h>
 #include <time.h>
 #include<sys/time.h>
-
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 enum GameState { Playing, Lost, Win };
 
@@ -124,6 +126,11 @@ void handle_win(void) {
   }
 }
 int main(void) {
+  #ifdef _WIN32
+  // Set encoding to UTF-8 for windows
+  SetConsoleOutputCP(65001);
+  #endif
+  enable_raw_mode();
   unsigned long last_update_time = current_time_millis();
   srand(last_update_time);
 
@@ -131,7 +138,6 @@ int main(void) {
   atexit(exit_alternative_screen);
 
   hide_cursor();
-  enable_raw_mode();
   atexit(show_cursor);
   atexit(reset_screen);
   #ifndef _WIN32
