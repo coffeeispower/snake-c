@@ -156,15 +156,15 @@ int main(void) {
     if (input == RESTART && state != Playing) {
       reset_game();
     }
-    if ((delta >= 500 / (powf(3, score() + 1)) || input != NONE)) {
+    if ((delta >= 500 / (powf(2, score() + 1)) || input != NONE)) {
       if (state == Playing) {
         snake_update(&snake, input);
         handle_fruit_collision();
         handle_self_collision();
         handle_win();
         last_update_time = current_time_millis();
+        redraw();
       }
-      redraw();
     }
     #ifdef _WIN32
     struct Vector2 current_terminal_size = get_terminal_size();
