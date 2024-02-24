@@ -50,22 +50,25 @@ bool snake_check_self_collision(struct Snake *self) {
   return false;
 }
 void snake_render(struct Snake *self) {
+  set_bg_color_256(41);
+  set_color_256(0);
   for (unsigned long i = 0; i < self->trail_size; i++) {
     struct Vector2 pos = self->trail_data[i];
     if (pos.x < 0 || pos.y < 0 || pos.x * 2 >= get_terminal_size().x ||
         pos.y >= get_terminal_size().y) {
       continue;
     }
-    move_cursor(pos.x * 2, pos.y);
-    set_bg_color_256(41);
-    set_color_256(0);
+    bool is_next_to_the_last_pos = i > 0 && self->trail_data[i-1].x == pos.x-1;
+    if(!is_next_to_the_last_pos){
+      move_cursor(pos.x * 2, pos.y);
+    }
     if (snake_is_head(self, pos)) {
       printf("··");
     } else {
       printf("  ");
     }
-    reset_styles();
   }
+  reset_styles();
 }
 void snake_update(struct Snake *self, enum SnakeInput input) {
   switch (input) {
