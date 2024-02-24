@@ -164,15 +164,6 @@ int main(void) {
     }
     if ((delta >= 500 / (powf(2, score() + 1)) || input != NONE)) {
       if (state == Playing) {
-        
-        delete_character_at((struct Vector2) {
-          .x = snake_head(&snake)->x*2,
-          .y = snake_head(&snake)->y
-        });
-        delete_character_at((struct Vector2) {
-          .x = snake_head(&snake)->x*2+1,
-          .y = snake_head(&snake)->y
-        });
         delete_character_at((struct Vector2) {
           .x = snake_tip(&snake)->x*2,
           .y = snake_tip(&snake)->y
