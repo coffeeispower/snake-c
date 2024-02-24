@@ -50,7 +50,6 @@ void render_lost_screen(void) {
   draw_rectangle_border(dialog_position, dialog_size);
   text_center("Perdeu", 0, -1);
   text_center("Aperta R para jogar outra vez", 0, 0);
-  fflush(stdout);
 }
 void render_win_screen(void) {
 
@@ -63,7 +62,6 @@ void render_win_screen(void) {
   draw_rectangle_border(dialog_position, dialog_size);
   text_center("Parabens por fazer o minimo ⭐", 0, -1);
   text_center("Conseguiste preencher o ecrã inteiro com a cobra", 0, 0);
-  fflush(stdout);
 }
 unsigned long digits_of_number(unsigned long n) {
   unsigned long state = n;
@@ -73,6 +71,12 @@ unsigned long digits_of_number(unsigned long n) {
     count++;
   } while (state != 0);
   return count;
+}
+void render_score(void) {
+  char* score_label = "Pontuação: ";
+  unsigned long score_text_size = strlen(score_label) + digits_of_number(score());
+  move_cursor(get_terminal_size().x-score_text_size, get_terminal_size().y - 1);
+  printf("%s%lu", score_label, score());
 }
 void redraw(void) {
   reset_screen();
@@ -90,10 +94,7 @@ void redraw(void) {
     render_win_screen();
     break;
   }
-  char* score_label = "Pontuação: ";
-  unsigned long score_text_size = strlen(score_label) + digits_of_number(score());
-  move_cursor(get_terminal_size().x-score_text_size, get_terminal_size().y - 1);
-  printf("%s%lu", score_label, score());
+  render_score();
   fflush(stdout);
 }
 void handle_resize(int _signal) { redraw(); }
@@ -111,6 +112,7 @@ void handle_self_collision(void) {
       snake_head(&snake)->y > get_terminal_size().y - 1 ||
       snake_head(&snake)->x < 0 || snake_head(&snake)->y < 0) {
     state = Lost;
+    render_lost_screen();
   }
 }
 void handle_fruit_collision(void) {
@@ -123,6 +125,7 @@ void handle_win(void) {
   if (snake.trail_max_size >=
       (get_terminal_size().x / 2) * get_terminal_size().y) {
     state = Win;
+    render_win_screen();
   }
 }
 int main(void) {
@@ -146,6 +149,7 @@ int main(void) {
   struct Vector2 last_terminal_size = get_terminal_size();
   #endif
   reset_game();
+  redraw();
   
   while (true) {
     unsigned long delta = current_time_millis() - last_update_time;
@@ -155,15 +159,35 @@ int main(void) {
     }
     if (input == RESTART && state != Playing) {
       reset_game();
+      redraw();
     }
     if ((delta >= 500 / (powf(2, score() + 1)) || input != NONE)) {
       if (state == Playing) {
+        
+        delete_character_at((struct Vector2) {
+          .x = snake_head(&snake)->x*2,
+          .y = snake_head(&snake)->y
+        });
+        delete_character_at((struct Vector2) {
+          .x = snake_head(&snake)->x*2+1,
+          .y = snake_head(&snake)->y
+        });
+        delete_character_at((struct Vector2) {
+          .x = snake_tip(&snake)->x*2,
+          .y = snake_tip(&snake)->y
+        });
+        delete_character_at((struct Vector2) {
+          .x = snake_tip(&snake)->x*2+1,
+          .y = snake_tip(&snake)->y
+        });
         snake_update(&snake, input);
         handle_fruit_collision();
         handle_self_collision();
         handle_win();
         last_update_time = current_time_millis();
-        redraw();
+        snake_render(&snake);
+        render_score();
+        fflush(stdout);
       }
     }
     #ifdef _WIN32

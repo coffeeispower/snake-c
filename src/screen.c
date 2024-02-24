@@ -96,3 +96,8 @@ void draw_rectangle_border(struct Vector2 position, struct Vector2 size){
   }
   printf("┛");
 }
+void delete_character_at(struct Vector2 position) {
+  move_cursor(position.x, position.y);
+  reset_styles();
+  printf(" ");
+}
