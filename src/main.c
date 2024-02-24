@@ -119,6 +119,7 @@ void handle_fruit_collision(void) {
   if (fruit_snake_collision(&fruit, &snake)) {
     randomize_fruit();
     snake.trail_max_size++;
+    fruit_render(&fruit);
   }
 }
 void handle_win(void) {
