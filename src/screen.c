@@ -1,7 +1,12 @@
 #include "screen.h"
 #include "vectors.h"
 #include <stdio.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <sys/ioctl.h>
+#endif
+
 void move_cursor(int x, int y) {
   if(x < 0) x = 0;
   if(y < 0) y = 0;
@@ -34,12 +39,22 @@ void exit_alternative_screen(void) {
   printf("\e[?1049l");
 }
 struct Vector2 get_terminal_size(void) {
+  struct Vector2 result;
+  #ifdef _WIN32
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    int columns, rows;
+
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    result.x = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+    result.y = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+  #else
+  
   struct winsize sz;
   ioctl( 0, TIOCGWINSZ, &sz );
-  return (struct Vector2) {
-    .x = sz.ws_col,
-    .y = sz.ws_row
-  };
+  result.x = sz.ws_col;
+  result.y = sz.ws_row;
+  #endif
+  return result;
 }
 
 void set_color_rgb(unsigned int color) {
@@ -80,4 +95,9 @@ void draw_rectangle_border(struct Vector2 position, struct Vector2 size){
     printf("━");
   }
   printf("┛");
+}
+void delete_character_at(struct Vector2 position) {
+  move_cursor(position.x, position.y);
+  reset_styles();
+  printf(" ");
 }
