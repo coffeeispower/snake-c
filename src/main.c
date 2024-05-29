@@ -98,6 +98,8 @@ void render_score(void) {
   printf("%s%lu", score_label, score());
 }
 void redraw(void) {
+  reset_styles();
+  set_bg_color_256(0);
   reset_screen();
   snake_render(&snake);
   reset_styles();
