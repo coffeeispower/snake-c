@@ -14,7 +14,8 @@ enum SnakeInput {
   /// Quit game
   QUIT,
   /// Restart the game
-  RESTART
+  RESTART,
+  CREDITS
 };
 
 enum SnakeInput read_input(void);

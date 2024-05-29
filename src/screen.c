@@ -58,11 +58,11 @@ struct Vector2 get_terminal_size(void) {
 }
 
 void set_color_rgb(unsigned int color) {
-  printf("\e[38;2;%d;%d;%dm", (color & 0xff0000) >> 16, (color & 0xff00) > 8, color & 0xff);
+  printf("\e[38;2;%d;%d;%dm", (color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff);
 }
 
 void set_bg_color_rgb(unsigned int color) {
-  printf("\e[48;2;%d;%d;%dm", (color & 0xff0000) >> 16, (color & 0xff00) > 8, color & 0xff);
+  printf("\e[48;2;%d;%d;%dm", (color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff);
 }
 
 void set_color_256(unsigned char color) {

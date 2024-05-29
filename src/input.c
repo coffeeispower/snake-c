@@ -51,6 +51,8 @@ enum SnakeInput read_input(void) {
     return QUIT;
   case 'r':
     return RESTART;
+  case 'c':
+    return CREDITS;
   case '\e':
     c = _read_char();
     /// User pressed escape

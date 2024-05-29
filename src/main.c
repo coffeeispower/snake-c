@@ -15,7 +15,7 @@
 #include <windows.h>
 #endif
 
-enum GameState { Playing, Lost, Win };
+enum GameState { Playing, Lost, Win, CreditsScreen };
 
 const unsigned long initial_size = 2;
 struct Snake snake = {0};
@@ -62,6 +62,25 @@ void render_win_screen(void) {
   draw_rectangle_border(dialog_position, dialog_size);
   text_center("Parabens por fazer o minimo ⭐", 0, -1);
   text_center("Conseguiste preencher o ecrã inteiro com a cobra", 0, 0);
+}
+void render_credits_screen(void) {
+
+  struct Vector2 dialog_size;
+  dialog_size.x = 55;
+  dialog_size.y = 8;
+  struct Vector2 dialog_position =
+      (struct Vector2){.x = get_terminal_size().x / 2 - dialog_size.x / 2,
+                       .y = get_terminal_size().y / 2 - dialog_size.y / 2};
+  draw_rectangle_border(dialog_position, dialog_size);
+  set_color_rgb(0x00ff5b);
+  text_center("Snake 1.1.0", 0, -2);
+  reset_styles();
+  text_center("Jogo feito por Tiago Dinis", 0, -1);
+  text_center("completamente feito em C com              ", 0, 0);
+  set_color_rgb(0x00ff5b);
+  text_center("0 bibliotecas", 14, 0);
+  reset_styles();
+  text_center("como tudo deveria ser...", 0, 1);
 }
 unsigned long digits_of_number(unsigned long n) {
   unsigned long state = n;
@@ -151,7 +170,6 @@ int main(void) {
   #endif
   reset_game();
   redraw();
-  
   while (true) {
     unsigned long delta = current_time_millis() - last_update_time;
     enum SnakeInput input = read_input();
@@ -160,6 +178,13 @@ int main(void) {
     }
     if (input == RESTART && state != Playing) {
       reset_game();
+      redraw();
+    }
+    if(input == CREDITS) {
+      render_credits_screen();
+      while(read_input() != QUIT) {
+        usleep(16666L);
+      }
       redraw();
     }
     if ((delta >= 500 / (powf(2, score() + 1)) || input != NONE)) {

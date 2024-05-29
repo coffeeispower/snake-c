@@ -39,8 +39,6 @@ void set_color_256(unsigned char color);
 void set_bg_color_256(unsigned char color);
 
 void draw_rectangle_border(struct Vector2 position, struct Vector2 size);
-
-
 void switch_to_alternative_screen(void);
 void exit_alternative_screen(void);
 void delete_character_at(struct Vector2 position);
